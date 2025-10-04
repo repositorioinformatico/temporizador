@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporizador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            padding: 20px;
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .new-timer {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], input[type="number"], select {
+            padding: 10px;
+            font-size: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            text-align: center;
+        }
+
+        select {
+            width: 100%;
+            min-width: 200px;
+        }
+
+        .input-with-label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 14px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .type-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-1px);
+        }
+
+        .type-btn.active {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .pomodoro-custom-config {
+            display: none;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pomodoro-custom-config.active {
+            display: flex;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-add {
+            background: #333;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-add:hover {
+            background: #1a1a1a;
+        }
+
+        .timers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .timer-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .timer-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .timer-type {
+            font-size: 12px;
+            padding: 4px 8px;
+            background: #e5e5e5;
+            color: #333;
+            border-radius: 5px;
+        }
+
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #1a1a1a;
+            text-align: center;
+            margin: 15px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-elapsed {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-start {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .btn-start:hover {
+            background: #000;
+        }
+
+        .btn-pause {
+            background: #666;
+            color: white;
+        }
+
+        .btn-pause:hover {
+            background: #555;
+        }
+
+        .btn-reset {
+            background: #999;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #888;
+        }
+
+        .btn-delete {
+            background: #999;
+            color: white;
+            padding: 8px 16px;
+        }
+
+        .btn-delete:hover {
+            background: #666;
+        }
+
+        .alarm {
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { color: #1a1a1a; }
+            50% { color: #999; }
+        }
+
+        .pomodoro-phase {
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .interval-alert {
+            background: #e5e5e5;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        small {
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1>⏱️ Temporizador</h1>
+
+        <div class="new-timer">
+            <div class="form-row">
+                <input type="text" id="labelInput" placeholder="Etiqueta (ej: Café, Ejercicio...)" />
+            </div>
+
+            <div class="type-selector">
+                <button type="button" class="type-btn active" data-type="normal" onclick="selectType('normal')">
+                    ⏱️ Normal
+                </button>
+                <button type="button" class="type-btn" data-type="pomodoro" onclick="selectType('pomodoro')">
+                    🍅 Pomodoro
+                </button>
+                <button type="button" class="type-btn" data-type="pomodoro-custom" onclick="selectType('pomodoro-custom')">
+                    🍅+ Personalizado
+                </button>
+            </div>
+
+            <div class="form-row" id="normalConfig">
+                <div class="input-with-label">
+                    <label for="hoursInput">Horas</label>
+                    <input type="number" id="hoursInput" placeholder="0" min="0" max="99" value="0" />
+                </div>
+                <div class="input-with-label">
+                    <label for="minutesInput">Minutos</label>
+                    <input type="number" id="minutesInput" placeholder="0" min="0" max="59" value="1" />
+                </div>
+                <div class="input-with-label">
+                    <label for="secondsInput">Segundos</label>
+                    <input type="number" id="secondsInput" placeholder="0" min="0" max="59" value="0" />
+                </div>
+            </div>
+
+            <div class="form-row pomodoro-custom-config" id="pomodoroCustomConfig">
+                <div class="input-with-label">
+                    <label for="workMinutes">Trabajo (min)</label>
+                    <input type="number" id="workMinutes" placeholder="25" min="1" max="120" value="25" />
+                </div>
+                <div class="input-with-label">
+                    <label for="breakMinutes">Descanso (min)</label>
+                    <input type="number" id="breakMinutes" placeholder="5" min="1" max="60" value="5" />
+                </div>
+            </div>
+
+            <button class="btn-add" onclick="addTimer()">+ Añadir Temporizador</button>
+        </div>
+
+        <div class="timers-list" id="timersList"></div>
+    </div>
+
+    <script>
+        let timers = [];
+        let nextId = 1;
+
+        let selectedType = 'normal';
+
+        function selectType(type) {
+            selectedType = type;
+
+            // Actualizar botones activos
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.type-btn[data-type="${type}"]`).classList.add('active');
+
+            // Mostrar/ocultar configuraciones
+            const normalConfig = document.getElementById('normalConfig');
+            const pomodoroCustomConfig = document.getElementById('pomodoroCustomConfig');
+
+            if (type === 'normal') {
+                normalConfig.style.display = 'flex';
+                pomodoroCustomConfig.classList.remove('active');
+            } else if (type === 'pomodoro') {
+                normalConfig.style.display = 'none';
+                pomodoroCustomConfig.classList.remove('active');
+            } else if (type === 'pomodoro-custom') {
+                normalConfig.style.display = 'none';
+                pomodoroCustomConfig.classList.add('active');
+            }
+        }
+
+        function addTimer() {
+            const label = document.getElementById('labelInput').value.trim() || 'Temporizador';
+            const type = selectedType;
+
+            let timer = {
+                id: nextId++,
+                label: label,
+                type: type,
+                totalSeconds: 0,
+                remainingSeconds: 0,
+                elapsedSeconds: 0,
+                isRunning: false,
+                isPaused: false,
+                interval: null
+            };
+
+            if (type === 'normal') {
+                const hours = parseInt(document.getElementById('hoursInput').value) || 0;
+                const minutes = parseInt(document.getElementById('minutesInput').value) || 0;
+                const seconds = parseInt(document.getElementById('secondsInput').value) || 0;
+                timer.totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                timer.remainingSeconds = timer.totalSeconds;
+            } else if (type === 'pomodoro') {
+                timer.totalSeconds = 25 * 60; // 25 min fijos
+                timer.remainingSeconds = 25 * 60;
+                timer.pomodoroPhase = 'trabajo';
+                timer.pomodoroCycle = 1;
+                timer.workTime = 25 * 60;
+                timer.breakTime = 5 * 60;
+            } else if (type === 'pomodoro-custom') {
+                const workMins = parseInt(document.getElementById('workMinutes').value) || 25;
+                const breakMins = parseInt(document.getElementById('breakMinutes').value) || 5;
+                timer.totalSeconds = workMins * 60;
+                timer.remainingSeconds = workMins * 60;
+                timer.pomodoroPhase = 'trabajo';
+                timer.pomodoroCycle = 1;
+                timer.workTime = workMins * 60;
+                timer.breakTime = breakMins * 60;
+            }
+
+            timers.push(timer);
+            renderTimers();
+
+            // Limpiar formulario
+            document.getElementById('labelInput').value = '';
+        }
+
+        function renderTimers() {
+            const container = document.getElementById('timersList');
+            container.innerHTML = '';
+
+            timers.forEach(timer => {
+                const card = document.createElement('div');
+                card.className = 'timer-card';
+
+                const hours = Math.floor(timer.remainingSeconds / 3600);
+                const mins = Math.floor((timer.remainingSeconds % 3600) / 60);
+                const secs = timer.remainingSeconds % 60;
+                const displayTime = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+                const elapsedHours = Math.floor(timer.elapsedSeconds / 3600);
+                const elapsedMins = Math.floor((timer.elapsedSeconds % 3600) / 60);
+                const elapsedSecs = timer.elapsedSeconds % 60;
+                const elapsedTime = `${String(elapsedHours).padStart(2, '0')}:${String(elapsedMins).padStart(2, '0')}:${String(elapsedSecs).padStart(2, '0')}`;
+
+                let typeLabel = timer.type === 'normal' ? 'Normal' :
+                               timer.type === 'pomodoro' ? 'Pomodoro' : 'Pomodoro Custom';
+
+                let pomodoroInfo = '';
+                if (timer.type === 'pomodoro' || timer.type === 'pomodoro-custom') {
+                    pomodoroInfo = `<div class="pomodoro-phase">
+                        🍅 Ciclo ${timer.pomodoroCycle} - ${timer.pomodoroPhase === 'trabajo' ? 'Trabajo' : 'Descanso'}
+                    </div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="timer-header">
+                        <span class="timer-label">${timer.label}</span>
+                        <span class="timer-type">${typeLabel}</span>
+                    </div>
+                    ${pomodoroInfo}
+                    <div class="timer-display ${timer.remainingSeconds === 0 ? 'alarm' : ''}">${displayTime}</div>
+                    <div class="timer-elapsed">⏱️ Transcurrido: ${elapsedTime}</div>
+                    <div class="timer-controls">
+                        <button class="btn-start" onclick="startTimer(${timer.id})" ${timer.isRunning ? 'disabled' : ''}>
+                            ${timer.isPaused ? 'Continuar' : 'Iniciar'}
+                        </button>
+                        <button class="btn-pause" onclick="pauseTimer(${timer.id})" ${!timer.isRunning ? 'disabled' : ''}>
+                            Pausar
+                        </button>
+                        <button class="btn-reset" onclick="resetTimer(${timer.id})">Resetear</button>
+                        <button class="btn-delete" onclick="deleteTimer(${timer.id})">✕</button>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function startTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (!timer || timer.isRunning) return;
+
+            if (timer.remainingSeconds <= 0 && !timer.isPaused) {
+                return;
+            }
+
+            timer.isRunning = true;
+            timer.isPaused = false;
+
+            timer.interval = setInterval(() => {
+                timer.remainingSeconds--;
+                timer.elapsedSeconds++;
+
+                renderTimers();
+
+                if (timer.remainingSeconds <= 0) {
+                    clearInterval(timer.interval);
+                    timer.isRunning = false;
+                    playAlarm();
+
+                    // Lógica Pomodoro
+                    if (timer.type === 'pomodoro' || timer.type === 'pomodoro-custom') {
+                        if (timer.pomodoroPhase === 'trabajo') {
+                            timer.pomodoroPhase = 'descanso';
+                            timer.remainingSeconds = timer.breakTime;
+                            timer.elapsedSeconds = 0;
+                        } else {
+                            timer.pomodoroPhase = 'trabajo';
+                            timer.pomodoroCycle++;
+                            timer.remainingSeconds = timer.workTime;
+                            timer.elapsedSeconds = 0;
+                        }
+                    }
+
+                    renderTimers();
+                }
+            }, 1000);
+
+            renderTimers();
+        }
+
+        function pauseTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (!timer || !timer.isRunning) return;
+
+            clearInterval(timer.interval);
+            timer.isRunning = false;
+            timer.isPaused = true;
+            renderTimers();
+        }
+
+        function resetTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (!timer) return;
+
+            clearInterval(timer.interval);
+            timer.isRunning = false;
+            timer.isPaused = false;
+            timer.remainingSeconds = timer.totalSeconds;
+            timer.elapsedSeconds = 0;
+
+            if (timer.type === 'pomodoro' || timer.type === 'pomodoro-custom') {
+                timer.pomodoroPhase = 'trabajo';
+                timer.pomodoroCycle = 1;
+                timer.remainingSeconds = timer.workTime;
+            }
+
+            renderTimers();
+        }
+
+        function deleteTimer(id) {
+            const timer = timers.find(t => t.id === id);
+            if (timer && timer.interval) {
+                clearInterval(timer.interval);
+            }
+            timers = timers.filter(t => t.id !== id);
+            renderTimers();
+        }
+
+        function playAlarm() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+    </script>
+</body>
+</html>
