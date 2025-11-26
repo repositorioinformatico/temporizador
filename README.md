@@ -2,6 +2,10 @@
 
 Aplicación web de temporizadores con soporte para Pomodoro. Diseño minimalista en blanco, negro y gris.
 
+## 🚀 Demo
+
+Prueba la aplicación en vivo: [https://repositorioinformatico.github.io/temporizador/](https://repositorioinformatico.github.io/temporizador/)
+
 ## Características
 
 - **3 tipos de temporizadores**: Normal, Pomodoro (25 min), Pomodoro Personalizado
